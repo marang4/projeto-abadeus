@@ -22,6 +22,6 @@ public class SwaggerConfiguration {
                 .info(new Info()
                         .title("Ticketing system Abadeus ")
                         .version("1.0.0")
-                        .description("Sistema de venda de ingressos"));
+                        .description("Sistema de venda de ingressos/"));
     }
 }
