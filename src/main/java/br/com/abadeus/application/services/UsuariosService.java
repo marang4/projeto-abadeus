@@ -19,8 +19,8 @@ public class UsuariosService {
     @Autowired
     private UsuariosRepository usuariosRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+//    @Autowired
+//    private PasswordEncoder passwordEncoder;
 
     @Transactional
     public UsuarioResponseDTO listarPorId(Long id) {
@@ -45,7 +45,7 @@ public class UsuariosService {
         }
 
         Usuarios novoUsuario = new Usuarios(usuarioRequestDTO);
-        novoUsuario.setSenha(passwordEncoder.encode(usuarioRequestDTO.senha()));
+//        novoUsuario.setSenha(passwordEncoder.encode(usuarioRequestDTO.senha()));
         novoUsuario.setRole("ROLE_USER");
         novoUsuario.setDataCriacao(LocalDateTime.now());
 
