@@ -7,6 +7,7 @@ import java.time.LocalDate;
 public record UsuarioResponseDTO (
     Long id,
     String nome,
+    String sobreNome,
     String cpf,
     String email,
     LocalDate dataNascimento,
@@ -18,6 +19,7 @@ public record UsuarioResponseDTO (
         this (
                 usuario.getId(),
                 usuario.getNome(),
+                usuario.getSobreNome(),
                 usuario.getCpf(),
                 usuario.getEmail(),
                 usuario.getDataNascimento(),

@@ -22,6 +22,7 @@ public class Usuarios implements UserDetails {
 
     public Usuarios (UsuarioRequestDTO usuarioRequestDTO) {
         this.setNome(usuarioRequestDTO.nome());
+        this.setSobreNome(usuarioRequestDTO.sobreNome());
         this.setEmail(usuarioRequestDTO.email());
         this.setSenha(usuarioRequestDTO.senha());
         this.setCpf(usuarioRequestDTO.cpf());
@@ -34,6 +35,8 @@ public class Usuarios implements UserDetails {
     private Long id;
 
     private String nome;
+
+    private String sobreNome;
 
     private String email;
 
@@ -49,23 +52,14 @@ public class Usuarios implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        if ("ROLE_ADMIN_GERAL".equals(this.role)) {
+        if ("ROLE_ADMIN".equals(this.role)) {
             return List.of(
                     new SimpleGrantedAuthority("ROLE_ADMIN"),
                     new SimpleGrantedAuthority("ROLE_USER")
             );
-
-        }else if ("ROLE_ADMIN".equals(this.role)) {
-            return List.of(
-                    new SimpleGrantedAuthority("ROLE_USER")
-            );
-
-        }else {
-            return List.of(new SimpleGrantedAuthority("ROLE_USER")
-            );
         }
 
-
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override

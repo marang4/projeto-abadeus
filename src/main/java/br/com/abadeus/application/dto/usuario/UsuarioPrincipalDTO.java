@@ -18,4 +18,8 @@ public record UsuarioPrincipalDTO(Long id,
                 usuario.getRole()
         );
     }
+
+    public boolean isAdmin() {
+        return "ROLE_ADMIN".equalsIgnoreCase(this.role);
+    }
 }

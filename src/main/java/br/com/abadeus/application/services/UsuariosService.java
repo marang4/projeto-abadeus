@@ -1,5 +1,6 @@
 package br.com.abadeus.application.services;
 
+import br.com.abadeus.application.dto.usuario.UsuarioPrincipalDTO;
 import br.com.abadeus.application.dto.usuario.UsuarioRequestDTO;
 import br.com.abadeus.application.dto.usuario.UsuarioResponseDTO;
 import br.com.abadeus.domain.entity.Usuarios;
@@ -51,5 +52,30 @@ public class UsuariosService {
 
         usuariosRepository.save(novoUsuario);
         return novoUsuario.toDtoResponse();
+    }
+
+    @Transactional
+    public UsuarioResponseDTO salvarUsuario(Long id, UsuarioRequestDTO usuarioRequest, UsuarioPrincipalDTO usuarioLogado) {
+
+        Usuarios usuario = usuariosRepository
+                .findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        if (usuarioLogado.isAdmin()) {
+
+            if (!usuario.getId().equals(usuarioLogado.id())) {
+                usuario.setRole(usuarioRequest.role());
+            }
+        }
+
+        usuario.setNome(usuarioRequest.nome());
+        usuario.setSobreNome(usuarioRequest.sobreNome());
+
+        if (usuarioRequest.senha() != null && !usuarioRequest.senha().isBlank()) {
+            usuario.setSenha(passwordEncoder.encode(usuarioRequest.senha()));
+        }
+
+        Usuarios salvo = usuariosRepository.save(usuario);
+        return new UsuarioResponseDTO(salvo);
     }
 }

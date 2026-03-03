@@ -50,5 +50,31 @@ public class UsuariosController {
         }
     }
 
-}
+    @PostMapping
+    @Operation(summary = "Criar usuário")
+    public ResponseEntity<UsuarioResponseDTO> criarUsuario(@RequestBody UsuarioRequestDTO usuarioRequestDTO) {
+        try {
+            UsuarioResponseDTO usuarioResponse = usuariosService.criarUsuario(usuarioRequestDTO);
 
+            return ResponseEntity.ok(usuarioResponse);
+
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Atualizar usuário")
+    public ResponseEntity<UsuarioResponseDTO> atualizarUsuario(
+            @PathVariable Long id,
+            @RequestBody UsuarioRequestDTO usuarioRequestDTO,
+            @AuthenticationPrincipal UsuarioPrincipalDTO usuarioLogado) {
+
+        try {
+            UsuarioResponseDTO usuarioResponse = usuariosService.salvarUsuario(id, usuarioRequestDTO, usuarioLogado);
+            return ResponseEntity.ok(usuarioResponse);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+}
