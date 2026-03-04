@@ -1,6 +1,7 @@
 package br.com.abadeus.domain.entity;
 
 import br.com.abadeus.application.dto.evento.EventoRequestDTO;
+import br.com.abadeus.application.dto.evento.EventoResponseDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -37,4 +38,8 @@ public class Eventos {
     private LocalDateTime dataHora;
 
     private LocalDateTime dataCriacao;
+
+    public EventoResponseDTO toDtoResponse(){
+        return new EventoResponseDTO(this);
+    }
 }

@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/evento")
 @Tag(name = "Controlador de eventos", description = "Gerencia o CRUD de eventos")
@@ -36,8 +38,8 @@ public class EventoController {
 
     @GetMapping
     @Operation(summary = "Consultar todos eventos")
-    public ResponseEntity<EventoResponseDTO> listarTodosEventos(@RequestParam(required = false) String nome){
-        return ResponseEntity.ok(eventoService.listarTodosEventos());
+    public ResponseEntity<List<EventoResponseDTO>> listarTodosEventos(@RequestParam(required = false) String nome){
+       return ResponseEntity.ok(eventoService.listarTodosEventos());
     }
 
     @PostMapping
@@ -46,6 +48,18 @@ public class EventoController {
 
         try {
             EventoResponseDTO eventoResponseDTO = eventoService.criarEvento(eventoRequestDTO);
+            return ResponseEntity.ok(eventoResponseDTO);
+        } catch (Exception e){
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Atualizar evento")
+    public ResponseEntity<EventoResponseDTO> atualizarEvento(@RequestBody EventoRequestDTO eventoRequestDTO, @PathVariable Long id){
+
+        try {
+            EventoResponseDTO eventoResponseDTO = eventoService.atualizarEvento(id, eventoRequestDTO);
             return ResponseEntity.ok(eventoResponseDTO);
         } catch (Exception e){
             return ResponseEntity.badRequest().build();
