@@ -1,7 +1,9 @@
 package br.com.abadeus.domain.entity;
 
+import br.com.abadeus.application.dto.usuario.UsuarioPrincipalDTO;
 import br.com.abadeus.application.dto.usuario.UsuarioRequestDTO;
 import br.com.abadeus.application.dto.usuario.UsuarioResponseDTO;
+import br.com.abadeus.domain.interfaces.AuthUser;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,11 +20,12 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @Table(name = "usuarios")
-public class Usuarios implements UserDetails {
+public class Usuarios implements UserDetails, AuthUser {
 
-    public Usuarios (UsuarioRequestDTO usuarioRequestDTO) {
+    public Usuarios(UsuarioRequestDTO usuarioRequestDTO) {
         this.setNome(usuarioRequestDTO.nome());
         this.setSobreNome(usuarioRequestDTO.sobreNome());
+        this.setTelefone(usuarioRequestDTO.telefone());
         this.setEmail(usuarioRequestDTO.email());
         this.setSenha(usuarioRequestDTO.senha());
         this.setCpf(usuarioRequestDTO.cpf());
@@ -38,6 +41,8 @@ public class Usuarios implements UserDetails {
 
     private String sobreNome;
 
+    private String telefone;
+
     private String email;
 
     private String senha;
@@ -49,6 +54,10 @@ public class Usuarios implements UserDetails {
     private LocalDate dataNascimento;
 
     private LocalDateTime dataCriacao;
+
+    private String tokenSenha;
+
+    private LocalDateTime tokenSenhaExpiracao;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -96,5 +105,7 @@ public class Usuarios implements UserDetails {
         return new UsuarioResponseDTO(this);
     }
 
+    public UsuarioPrincipalDTO toPrincipalDTO() {
+        return new UsuarioPrincipalDTO(this);
+    }
 }
-

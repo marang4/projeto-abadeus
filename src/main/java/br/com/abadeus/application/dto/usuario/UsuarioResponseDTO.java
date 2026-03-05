@@ -8,6 +8,8 @@ public record UsuarioResponseDTO (
     Long id,
     String nome,
     String sobreNome,
+
+    String telefone,
     String cpf,
     String email,
     LocalDate dataNascimento,
@@ -20,6 +22,7 @@ public record UsuarioResponseDTO (
                 usuario.getId(),
                 usuario.getNome(),
                 usuario.getSobreNome(),
+                usuario.getTelefone(),
                 usuario.getCpf(),
                 usuario.getEmail(),
                 usuario.getDataNascimento(),

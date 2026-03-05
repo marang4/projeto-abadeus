@@ -30,13 +30,23 @@ public class SecurityConfig {
 
         return http.cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth ->
-                        auth
+                .authorizeHttpRequests(auth -> auth
+                        // Libera requisições de pre-flight do CORS (necessário para o frontend)
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
-                                .anyRequest().authenticated()
+                        // Libera o Swagger e a documentação
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**").permitAll()
+
+                        // Libera a criação de novos usuários
+                        .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
+
+                        // auth
+                        .requestMatchers(HttpMethod.POST, "/auth/login").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/recuperarsenha").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/auth/resetarsenha").permitAll()
+
+
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

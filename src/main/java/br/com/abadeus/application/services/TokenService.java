@@ -1,10 +1,9 @@
 package br.com.abadeus.application.services;
 
-// Adicione a importação do DTO que o JwtFilter espera
-import br.com.abadeus.application.dto.usuario.UsuarioPrincipalDTO;
-import br.com.abadeus.domain.repository.TokenRepository;
-import br.com.abadeus.domain.repository.UsuariosRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import br.com.abadeus.domain.interfaces.AuthUser;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -15,35 +14,39 @@ import java.time.ZoneOffset;
 @Service
 public class TokenService {
 
-    @Value("${spring.secretkey}") //para buscar a variavel dentro do properties
+    @Value("${spring.secretkey}")
     private String secret;
 
     @Value("${spring.tempo_expiracao}")
     private Long tempo;
 
-    private String emissor = "DEVTEST";
+    private final String EMISSOR = "ABADEUS";
 
-    @Autowired
-    private TokenRepository tokenRepository;
-
-    @Autowired
-    private UsuariosRepository usuariosRepository;
-
-    private Instant gerarDataExpiracao() {
-        var dataAtual = LocalDateTime.now();
-        dataAtual = dataAtual.plusMinutes(tempo);
-        return dataAtual.toInstant(ZoneOffset.of("-03:00"));
+    public String gerarToken(AuthUser user) {
+        Algorithm algorithm = Algorithm.HMAC256(secret);
+        return JWT.create()
+                .withIssuer(EMISSOR)
+                .withSubject(user.getEmail())
+                .withClaim("role", user.getRole())
+                .withClaim("userId", user.getId())
+                .withExpiresAt(this.gerarDataExpiracao())
+                .sign(algorithm);
     }
 
-    public UsuarioPrincipalDTO validarToken(String token) {
+    public String extrairEmailDoToken(String token) {
         try {
-
-
-            return null;
-
-        } catch (Exception exception) {
-
-            return null;
+            Algorithm algorithm = Algorithm.HMAC256(secret);
+            return JWT.require(algorithm)
+                    .withIssuer(EMISSOR)
+                    .build()
+                    .verify(token)
+                    .getSubject();
+        } catch (JWTVerificationException exception) {
+            throw new RuntimeException("Token inválido ou expirado.");
         }
+    }
+
+    private Instant gerarDataExpiracao() {
+        return LocalDateTime.now().plusMinutes(tempo).toInstant(ZoneOffset.of("-03:00"));
     }
 }
