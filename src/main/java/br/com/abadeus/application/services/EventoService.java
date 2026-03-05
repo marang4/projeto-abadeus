@@ -1,4 +1,4 @@
-package br.com.abadeus.application.services.evento;
+package br.com.abadeus.application.services;
 
 import br.com.abadeus.application.dto.evento.EventoRequestDTO;
 import br.com.abadeus.application.dto.evento.EventoResponseDTO;

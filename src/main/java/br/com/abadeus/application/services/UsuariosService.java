@@ -20,8 +20,8 @@ public class UsuariosService {
     @Autowired
     private UsuariosRepository usuariosRepository;
 
-//    @Autowired
-//    private PasswordEncoder passwordEncoder;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Transactional
     public UsuarioResponseDTO listarPorId(Long id) {
