@@ -17,14 +17,9 @@ import java.time.LocalDateTime;
 public class Eventos {
 
     public Eventos(EventoRequestDTO eventoRequestDTO){
-        this.setId(eventoRequestDTO.id());
         this.setNome(eventoRequestDTO.nome());
         this.setDescricao(eventoRequestDTO.descricao());
         this.setDataHora(eventoRequestDTO.dataHora());
-
-        if (this.getDataCriacao() == null){
-            this.setDataCriacao(LocalDateTime.now());
-        }
     }
 
     @Id
@@ -37,7 +32,7 @@ public class Eventos {
 
     private LocalDateTime dataHora;
 
-    private LocalDateTime dataCriacao;
+    private LocalDateTime dataCriacao = LocalDateTime.now();
 
     public EventoResponseDTO toDtoResponse(){
         return new EventoResponseDTO(this);

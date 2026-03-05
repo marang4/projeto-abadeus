@@ -1,12 +1,11 @@
-package br.com.abadeus.presentation.evento;
+package br.com.abadeus.presentation;
 
 import br.com.abadeus.application.dto.evento.EventoRequestDTO;
 import br.com.abadeus.application.dto.evento.EventoResponseDTO;
-import br.com.abadeus.application.services.evento.EventoService;
+import br.com.abadeus.application.services.EventoService;
 import br.com.abadeus.domain.repository.EventoRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
