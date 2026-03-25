@@ -1,7 +1,6 @@
 package br.com.abadeus.domain.entity;
 
 import br.com.abadeus.application.dto.evento.EventoRequestDTO;
-import br.com.abadeus.application.dto.evento.EventoResponseDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -16,25 +15,29 @@ import java.time.LocalDateTime;
 @Table(name = "evento")
 public class Eventos {
 
-    public Eventos(EventoRequestDTO eventoRequestDTO){
-        this.setNome(eventoRequestDTO.nome());
-        this.setDescricao(eventoRequestDTO.descricao());
-        this.setDataHora(eventoRequestDTO.dataHora());
+    public Eventos(EventoRequestDTO dto){
+        this.nome = dto.nome();
+        this.descricao = dto.descricao();
+        this.quantidadeOcupacao = dto.quantidadeOcupacao();
+        this.dataHora = dto.dataHora();
+        this.dataCriacao = LocalDateTime.now();
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, unique = true)
     private String nome;
 
+    @Column(nullable = false)
     private String descricao;
 
+    @Column(nullable = false)
+    private Integer quantidadeOcupacao;
+
+    @Column(nullable = false)
     private LocalDateTime dataHora;
 
-    private LocalDateTime dataCriacao = LocalDateTime.now();
-
-    public EventoResponseDTO toDtoResponse(){
-        return new EventoResponseDTO(this);
-    }
+    private LocalDateTime dataCriacao;
 }

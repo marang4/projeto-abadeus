@@ -1,15 +1,10 @@
 package br.com.abadeus.domain.entity;
 
 import br.com.abadeus.application.dto.endereco.EnderecoRequestDTO;
-import br.com.abadeus.application.dto.endereco.EnderecoResponseDTO;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
 import java.time.LocalDateTime;
 
 @Entity
@@ -19,27 +14,40 @@ import java.time.LocalDateTime;
 @Table(name = "enderecos")
 public class Enderecos {
 
-    public Enderecos(EnderecoRequestDTO enderecoRequestDTO){
-        this.setCep(enderecoRequestDTO.cep());
-        this.setNumero(enderecoRequestDTO.numero());
-        this.setLogradouro(enderecoRequestDTO.logradouro());
-        this.setComplemento(enderecoRequestDTO.complemento());
-        this.setBairro(enderecoRequestDTO.bairro());
-        this.setCidade(enderecoRequestDTO.cidade());
-        this.setUf(enderecoRequestDTO.uf());
+    public Enderecos(EnderecoRequestDTO dto) {
+        this.cep = dto.cep() != null ? dto.cep().replaceAll("\\D", "") : null;
+        this.numero = dto.numero();
+        this.logradouro = dto.logradouro();
+        this.complemento = dto.complemento();
+        this.bairro = dto.bairro();
+        this.cidade = dto.cidade();
+        this.uf = dto.uf();
+        this.dataCriacao = LocalDateTime.now();
     }
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String cep;
-    private Long numero;
-    private String logradouro;
-    private String complemento;
-    private String bairro;
-    private String cidade;
-    private String uf;
-    private LocalDateTime dataCriacao = LocalDateTime.now();
 
-    public EnderecoResponseDTO toDtoResponse(){return new EnderecoResponseDTO(this);}
+    @Column(nullable = false, length = 8)
+    private String cep;
+
+    @Column(nullable = false)
+    private Long numero;
+
+    @Column(nullable = false)
+    private String logradouro;
+
+    private String complemento;
+
+    @Column(nullable = false)
+    private String bairro;
+
+    @Column(nullable = false)
+    private String cidade;
+
+    @Column(nullable = false, length = 2)
+    private String uf;
+
+    private LocalDateTime dataCriacao;
 }

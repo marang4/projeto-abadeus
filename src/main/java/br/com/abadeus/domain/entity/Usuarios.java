@@ -11,7 +11,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
@@ -22,36 +21,28 @@ import java.util.List;
 @Table(name = "usuarios")
 public class Usuarios implements UserDetails, AuthUser {
 
-    public Usuarios(UsuarioRequestDTO usuarioRequestDTO) {
-        this.setNome(usuarioRequestDTO.nome());
-        this.setSobreNome(usuarioRequestDTO.sobreNome());
-        this.setTelefone(usuarioRequestDTO.telefone());
-        this.setEmail(usuarioRequestDTO.email());
-        this.setSenha(usuarioRequestDTO.senha());
-        this.setCpf(usuarioRequestDTO.cpf());
-        this.setDataNascimento(usuarioRequestDTO.dataNascimento());
-        this.setRole(usuarioRequestDTO.role());
+    public Usuarios(UsuarioRequestDTO dto) {
+        this.nome = dto.nome();
+        this.email = dto.email();
+        this.senha = dto.senha();
+        this.role = dto.role();
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private String nome;
 
-    private String sobreNome;
-
-    private String telefone;
-
+    @Column(nullable = false, unique = true)
     private String email;
 
+    @Column(nullable = false)
     private String senha;
 
+    @Column(nullable = false)
     private String role;
-
-    private String cpf;
-
-    private LocalDate dataNascimento;
 
     private LocalDateTime dataCriacao;
 
@@ -67,39 +58,30 @@ public class Usuarios implements UserDetails, AuthUser {
                     new SimpleGrantedAuthority("ROLE_USER")
             );
         }
+        if ("ROLE_USER".equals(this.role)) {
+            return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        }
 
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        return List.of(new SimpleGrantedAuthority("ROLE_CLIENTE"));
     }
 
     @Override
-    public String getPassword() {
-        return this.senha;
-    }
+    public String getPassword() { return this.senha; }
 
     @Override
-    public String getUsername() {
-        return this.email;
-    }
+    public String getUsername() { return this.email; }
 
     @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
+    public boolean isAccountNonExpired() { return true; }
 
     @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
+    public boolean isAccountNonLocked() { return true; }
 
     @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
+    public boolean isCredentialsNonExpired() { return true; }
 
     @Override
-    public boolean isEnabled() {
-        return true;
-    }
+    public boolean isEnabled() { return true; }
 
     public UsuarioResponseDTO toDtoResponse() {
         return new UsuarioResponseDTO(this);

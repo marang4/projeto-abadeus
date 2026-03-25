@@ -4,6 +4,7 @@ import br.com.abadeus.application.dto.usuario.UsuarioPrincipalDTO;
 import br.com.abadeus.application.dto.usuario.UsuarioRequestDTO;
 import br.com.abadeus.application.dto.usuario.UsuarioResponseDTO;
 import br.com.abadeus.domain.entity.Usuarios;
+import br.com.abadeus.domain.exception.RegraDeNegocioException;
 import br.com.abadeus.domain.repository.UsuariosRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,14 +24,12 @@ public class UsuariosService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Transactional
-    public UsuarioResponseDTO listarPorId(Long id) {
+    public UsuarioResponseDTO listarUsuarioPorId(Long id) {
         return usuariosRepository.findById(id)
                 .map(UsuarioResponseDTO::new)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new RegraDeNegocioException("Usuário não encontrado."));
     }
 
-    @Transactional
     public List<UsuarioResponseDTO> listarTodosUsuarios() {
         return usuariosRepository.findAll()
                 .stream()
@@ -39,15 +38,16 @@ public class UsuariosService {
     }
 
     @Transactional
-    public UsuarioResponseDTO criarUsuario(UsuarioRequestDTO usuarioRequestDTO) {
+    public UsuarioResponseDTO criarUsuario(UsuarioRequestDTO dto) {
+        String emailTratado = dto.email() != null ? dto.email().toLowerCase().trim() : "";
 
-        if (usuariosRepository.existsByEmail(usuarioRequestDTO.email())) {
-            throw new RuntimeException("Email já cadastrado.");
+        if (usuariosRepository.existsByEmail(emailTratado)) {
+            throw new RegraDeNegocioException("E-mail já cadastrado para outro usuário.");
         }
 
-        Usuarios novoUsuario = new Usuarios(usuarioRequestDTO);
-        novoUsuario.setSenha(passwordEncoder.encode(usuarioRequestDTO.senha()));
-        novoUsuario.setRole("ROLE_USER");
+        Usuarios novoUsuario = new Usuarios(dto);
+        novoUsuario.setEmail(emailTratado);
+        novoUsuario.setSenha(passwordEncoder.encode(dto.senha()));
         novoUsuario.setDataCriacao(LocalDateTime.now());
 
         usuariosRepository.save(novoUsuario);
@@ -55,27 +55,21 @@ public class UsuariosService {
     }
 
     @Transactional
-    public UsuarioResponseDTO salvarUsuario(Long id, UsuarioRequestDTO usuarioRequest, UsuarioPrincipalDTO usuarioLogado) {
+    public UsuarioResponseDTO atualizarUsuario(Long id, UsuarioRequestDTO dto, UsuarioPrincipalDTO autenticacao) {
+        Usuarios usuario = usuariosRepository.findById(id)
+                .orElseThrow(() -> new RegraDeNegocioException("Usuário não encontrado."));
 
-        Usuarios usuario = usuariosRepository
-                .findById(id)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-
-        if (usuarioLogado.isAdmin()) {
-
-            if (!usuario.getId().equals(usuarioLogado.id())) {
-                usuario.setRole(usuarioRequest.role());
-            }
+        if (autenticacao.isAdmin() && !usuario.getId().equals(autenticacao.id())) {
+            usuario.setRole(dto.role());
         }
 
-        usuario.setNome(usuarioRequest.nome());
-        usuario.setSobreNome(usuarioRequest.sobreNome());
+        usuario.setNome(dto.nome());
 
-        if (usuarioRequest.senha() != null && !usuarioRequest.senha().isBlank()) {
-            usuario.setSenha(passwordEncoder.encode(usuarioRequest.senha()));
+        if (dto.senha() != null && !dto.senha().isBlank()) {
+            usuario.setSenha(passwordEncoder.encode(dto.senha()));
         }
 
         Usuarios salvo = usuariosRepository.save(usuario);
-        return new UsuarioResponseDTO(salvo);
+        return salvo.toDtoResponse();
     }
 }
