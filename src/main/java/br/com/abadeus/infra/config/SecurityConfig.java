@@ -47,6 +47,8 @@ public class SecurityConfig {
                 )
 
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS,"/**").permitAll()
+
 
                         // Libera o Swagger e a documentação
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**").permitAll()
@@ -54,7 +56,7 @@ public class SecurityConfig {
                         // auth
                         .requestMatchers("/auth/login", "/auth/recuperarsenha", "/auth/resetarsenha").permitAll()
 
-                        .requestMatchers(HttpMethod.POST, "/clientes").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/clientes", "/endereco").permitAll()
 
                         // BLOQUEIO PESADO: Somente ADMIN mexe em usuários
                         .requestMatchers("/usuarios/**").hasRole("ADMIN")
