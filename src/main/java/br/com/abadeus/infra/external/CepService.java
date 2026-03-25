@@ -29,13 +29,11 @@ public class CepService {
         System.err.println("ViaCEP indisponível ou erro. Acionando fallback: " + e.getMessage());
         return new CepResponseDTO(
                 cep,
-                "N/A",
-                "N/A",
-                "N/A",
-                "N/A",
-                "N/A",
-                0.0,
-                0.0,
+                "NA",
+                "",
+                "NA",
+                "NA",
+                "NA",
                 true
         );
     }
