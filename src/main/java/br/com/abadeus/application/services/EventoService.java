@@ -3,12 +3,12 @@ package br.com.abadeus.application.services;
 import br.com.abadeus.application.dto.evento.EventoRequestDTO;
 import br.com.abadeus.application.dto.evento.EventoResponseDTO;
 import br.com.abadeus.domain.entity.Eventos;
+import br.com.abadeus.domain.exception.RegraDeNegocioException;
 import br.com.abadeus.domain.repository.EventoRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,10 +18,10 @@ public class EventoService {
     @Autowired
     private EventoRepository eventoRepository;
 
-    public EventoResponseDTO listarPorId(Long id) {
+    public EventoResponseDTO listarEventoPorId(Long id) {
         return eventoRepository.findById(id)
                 .map(EventoResponseDTO::new)
-                .orElseThrow(() -> new RuntimeException("Evento não encontrado"));
+                .orElseThrow(() -> new RegraDeNegocioException("Evento não encontrado."));
     }
 
     public List<EventoResponseDTO> listarTodosEventos() {
@@ -31,30 +31,31 @@ public class EventoService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public EventoResponseDTO criarEvento(EventoRequestDTO dto) {
+        if (eventoRepository.existsByNomeIgnoreCase(dto.nome())) {
+            throw new RegraDeNegocioException("Já existe um evento cadastrado com este nome.");
+        }
 
-    public EventoResponseDTO criarEvento(EventoRequestDTO eventoRequestDTO) {
-        Eventos novoEvento = new Eventos();
-
-        novoEvento.setNome(eventoRequestDTO.nome());
-        novoEvento.setDataCriacao(LocalDateTime.now());
-        novoEvento.setDataHora(eventoRequestDTO.dataHora());
-        novoEvento.setDescricao(eventoRequestDTO.descricao());
-
+        Eventos novoEvento = new Eventos(dto);
         eventoRepository.save(novoEvento);
-        return novoEvento.toDtoResponse();
+        return new EventoResponseDTO(novoEvento);
     }
 
     @Transactional
-    public EventoResponseDTO atualizarEvento(Long id, EventoRequestDTO eventoRequestDTO) {
-        Eventos eventos = eventoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Evento não encontrado"));
+    public EventoResponseDTO atualizarEvento(Long id, EventoRequestDTO dto) {
+        Eventos evento = eventoRepository.findById(id)
+                .orElseThrow(() -> new RegraDeNegocioException("Evento não encontrado."));
 
-        eventos.setNome(eventoRequestDTO.nome());
-        eventos.setDescricao(eventoRequestDTO.descricao());
-        eventos.setDataHora(eventoRequestDTO.dataHora());
+        if (!evento.getNome().equalsIgnoreCase(dto.nome()) && eventoRepository.existsByNomeIgnoreCase(dto.nome())) {
+            throw new RegraDeNegocioException("Já existe outro evento com este nome.");
+        }
 
-        eventoRepository.save(eventos);
+        evento.setNome(dto.nome());
+        evento.setDescricao(dto.descricao());
+        evento.setQuantidadeOcupacao(dto.quantidadeOcupacao());
+        evento.setDataHora(dto.dataHora());
 
-        return eventos.toDtoResponse();
+        return new EventoResponseDTO(eventoRepository.save(evento));
     }
 }

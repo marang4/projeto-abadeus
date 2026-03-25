@@ -4,6 +4,7 @@ import br.com.abadeus.application.dto.auth.*;
 import br.com.abadeus.application.dto.usuario.UsuarioPrincipalDTO;
 import br.com.abadeus.application.dto.usuario.UsuarioResponseDTO;
 import br.com.abadeus.domain.entity.Usuarios;
+import br.com.abadeus.domain.exception.RegraDeNegocioException;
 import br.com.abadeus.domain.interfaces.IEnvioEmail;
 import br.com.abadeus.domain.repository.UsuariosRepository;
 import jakarta.servlet.http.Cookie;
@@ -36,9 +37,12 @@ public class AuthService {
     private String frontendBaseUrl;
 
     public UsuarioResponseDTO realizarLogin(LoginRequestDTO request, HttpServletResponse response) {
+
         boolean valido = validarCredenciais(request.email(), request.senha());
+
         if (!valido) {
-            throw new RuntimeException("Credenciais inválidas.");
+            // Lança a exceção customizada; o Controller vai mapear para 401 (UNAUTHORIZED)
+            throw new RegraDeNegocioException("Credenciais inválidas.");
         }
 
         Usuarios user = buscarPorEmail(request.email());
@@ -85,7 +89,8 @@ public class AuthService {
         Usuarios user = buscarToken(dto.token());
 
         if (user == null || user.getTokenSenhaExpiracao().isBefore(LocalDateTime.now())) {
-            throw new RuntimeException("Token inválido ou expirado.");
+
+            throw new RegraDeNegocioException("Token inválido ou expirado.");
         }
 
         user.setSenha(passwordEncoder.encode(dto.senha()));
@@ -100,11 +105,11 @@ public class AuthService {
         Usuarios user = buscarEmail(usuarioLogado.email().toLowerCase().trim());
 
         if (user == null) {
-            throw new RuntimeException("Usuário não encontrado.");
+            throw new RegraDeNegocioException("Usuário não encontrado.");
         }
 
         if (!passwordEncoder.matches(dto.senhaAtual(), user.getSenha())) {
-            throw new RuntimeException("Senha atual incorreta.");
+            throw new RegraDeNegocioException("Senha atual incorreta.");
         }
 
         user.setSenha(passwordEncoder.encode(dto.novaSenha()));
