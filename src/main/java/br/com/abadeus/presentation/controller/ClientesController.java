@@ -41,6 +41,7 @@ public class ClientesController {
     @Operation(summary = "Consultar todos clientes")
     public ResponseEntity<List<ClienteResponseDTO>> listarTodosClientes(
             @AuthenticationPrincipal UsuarioPrincipalDTO autenticacao) {
+
         return ResponseEntity.ok(clientesService.listarTodosClientes());
     }
 
@@ -52,7 +53,6 @@ public class ClientesController {
         try {
             ClienteResponseDTO response = clientesService.criarCliente(clienteRequest);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-
         } catch (RegraDeNegocioException e) {
             return ResponseEntity.badRequest().body(ResponseUtil.response(e.getMessage()));
         }

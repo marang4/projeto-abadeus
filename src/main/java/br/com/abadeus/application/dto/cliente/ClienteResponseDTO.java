@@ -23,7 +23,7 @@ public record ClienteResponseDTO(
                 cliente.getTelefone(),
                 cliente.getCpf(),
                 cliente.getDataNascimento(),
-                cliente.getEnderecos() != null ? new EnderecoResponseDTO(cliente.getEnderecos()) : null
+                cliente.getEndereco() != null ? new EnderecoResponseDTO(cliente.getEndereco()) : null
         );
     }
 }

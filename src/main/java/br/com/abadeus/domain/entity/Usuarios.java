@@ -41,7 +41,6 @@ public class Usuarios implements UserDetails, AuthUser {
     @Column(nullable = false)
     private String senha;
 
-    @Column(nullable = false)
     private String role;
 
     private LocalDateTime dataCriacao;

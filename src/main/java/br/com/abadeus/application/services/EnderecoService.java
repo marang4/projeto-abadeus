@@ -36,24 +36,25 @@ public class EnderecoService {
     }
 
     @Transactional
-    public EnderecoResponseDTO criarEndereco(EnderecoRequestDTO dto) {
-        Enderecos novoEndereco = new Enderecos(dto);
+    public Enderecos criarEndereco(EnderecoRequestDTO dto) {
+        Enderecos endereco = new Enderecos(dto);
 
-        if (dto.logradouro() == null || dto.logradouro().isBlank()) {
+        boolean dadosFaltando = isBlank(dto.logradouro()) || isBlank(dto.bairro()) || isBlank(dto.cidade()) || isBlank(dto.uf());
+
+        if (dadosFaltando) {
             var dadosCep = cepService.consultarCep(dto.cep());
 
-            if (dadosCep == null || dadosCep.erro() != null) {
-                throw new RegraDeNegocioException("CEP não localizado ou inválido.");
+            if (dadosCep == null || Boolean.TRUE.equals(dadosCep.erro())) {
+                throw new RegraDeNegocioException("CEP não localizado. Informe logradouro, bairro, cidade e UF manualmente.");
             }
 
-            novoEndereco.setLogradouro(dadosCep.logradouro());
-            novoEndereco.setBairro(dadosCep.bairro());
-            novoEndereco.setCidade(dadosCep.cidade());
-            novoEndereco.setUf(dadosCep.uf());
+            if (isBlank(endereco.getLogradouro())) endereco.setLogradouro(dadosCep.logradouro());
+            if (isBlank(endereco.getBairro()))     endereco.setBairro(dadosCep.bairro());
+            if (isBlank(endereco.getCidade()))     endereco.setCidade(dadosCep.cidade());
+            if (isBlank(endereco.getUf()))         endereco.setUf(dadosCep.uf());
         }
 
-        Enderecos salvo = enderecoRepository.save(novoEndereco);
-        return new EnderecoResponseDTO(salvo);
+        return enderecoRepository.save(endereco);
     }
 
     @Transactional
@@ -63,13 +64,30 @@ public class EnderecoService {
 
         endereco.setCep(dto.cep().replaceAll("\\D", ""));
         endereco.setNumero(dto.numero());
-        endereco.setLogradouro(dto.logradouro());
         endereco.setComplemento(dto.complemento());
-        endereco.setBairro(dto.bairro());
-        endereco.setCidade(dto.cidade());
-        endereco.setUf(dto.uf());
 
-        Enderecos salvo = enderecoRepository.save(endereco);
-        return new EnderecoResponseDTO(salvo);
+        boolean dadosFaltando = isBlank(dto.logradouro()) || isBlank(dto.bairro()) || isBlank(dto.cidade()) || isBlank(dto.uf());
+
+        if (dadosFaltando) {
+            var dadosCep = cepService.consultarCep(dto.cep());
+            if (dadosCep == null || Boolean.TRUE.equals(dadosCep.erro())) {
+                throw new RegraDeNegocioException("CEP não localizado. Informe logradouro, bairro, cidade e UF manualmente.");
+            }
+            if (isBlank(endereco.getLogradouro())) endereco.setLogradouro(dadosCep.logradouro());
+            if (isBlank(endereco.getBairro()))     endereco.setBairro(dadosCep.bairro());
+            if (isBlank(endereco.getCidade()))     endereco.setCidade(dadosCep.cidade());
+            if (isBlank(endereco.getUf()))         endereco.setUf(dadosCep.uf());
+        } else {
+            endereco.setLogradouro(dto.logradouro());
+            endereco.setBairro(dto.bairro());
+            endereco.setCidade(dto.cidade());
+            endereco.setUf(dto.uf());
+        }
+
+        return new EnderecoResponseDTO(enderecoRepository.save(endereco));
+    }
+
+    private boolean isBlank(String value) {
+        return value == null || value.isBlank();
     }
 }

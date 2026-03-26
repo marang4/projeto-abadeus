@@ -22,7 +22,6 @@ public class SecurityConfig {
     @Autowired
     private JwtFilter jwtFilter;
 
-    // 1. INJEÇÃO ADICIONADA: Pega o resolvedor de erros global do Spring
     @Autowired
     @Qualifier("handlerExceptionResolver")
     private HandlerExceptionResolver exceptionResolver;
@@ -45,20 +44,15 @@ public class SecurityConfig {
                             exceptionResolver.resolveException(request, response, null, accessDeniedException);
                         })
                 )
-
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // Libera o Swagger e a documentação
+
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**").permitAll()
-
-                        // auth
                         .requestMatchers("/auth/login", "/auth/recuperarsenha", "/auth/resetarsenha").permitAll()
-
                         .requestMatchers(HttpMethod.POST, "/clientes").permitAll()
-
-                        // BLOQUEIO PESADO: Somente ADMIN mexe em usuários
+                        .requestMatchers("/endereco/**").authenticated()
                         .requestMatchers("/usuarios/**").hasRole("ADMIN")
-
 
                         .anyRequest().authenticated()
                 )
