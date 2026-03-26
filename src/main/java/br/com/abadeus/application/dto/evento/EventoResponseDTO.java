@@ -8,7 +8,8 @@ public record EventoResponseDTO(
         String nome,
         String descricao,
         Integer quantidadeOcupacao,
-        LocalDateTime dataHora
+        LocalDateTime dataHora,
+        Long valor
 ) {
     public EventoResponseDTO(Eventos evento){
         this(
@@ -16,7 +17,8 @@ public record EventoResponseDTO(
                 evento.getNome(),
                 evento.getDescricao(),
                 evento.getQuantidadeOcupacao(),
-                evento.getDataHora()
+                evento.getDataHora(),
+                evento.getValor()
         );
     }
 }

@@ -19,5 +19,7 @@ public record EventoRequestDTO(
 
         @NotNull(message = "A data e hora do evento são obrigatórias")
         @JsonFormat(pattern = "dd/MM/yyyy HH:mm") // Padronizado para facilitar o uso
-        LocalDateTime dataHora
+        LocalDateTime dataHora,
+
+        Long valor
 ) {}
