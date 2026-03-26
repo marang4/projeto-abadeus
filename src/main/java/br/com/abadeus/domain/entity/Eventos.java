@@ -20,6 +20,7 @@ public class Eventos {
         this.descricao = dto.descricao();
         this.quantidadeOcupacao = dto.quantidadeOcupacao();
         this.dataHora = dto.dataHora();
+        this.valor = dto.valor();
         this.dataCriacao = LocalDateTime.now();
     }
 
@@ -38,6 +39,9 @@ public class Eventos {
 
     @Column(nullable = false)
     private LocalDateTime dataHora;
+
+    @Column(nullable = false)
+    private Long valor;
 
     private LocalDateTime dataCriacao;
 }
