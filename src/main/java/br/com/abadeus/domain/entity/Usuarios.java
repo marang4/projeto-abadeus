@@ -49,6 +49,14 @@ public class Usuarios implements UserDetails, AuthUser {
 
     private LocalDateTime tokenSenhaExpiracao;
 
+    @Column(nullable = false)
+    private boolean ativo = false;
+
+    @Column(nullable = false)
+    private String urlDocumento;
+
+    private String tokenAtivacao;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         if ("ROLE_ADMIN".equals(this.role)) {
@@ -80,7 +88,9 @@ public class Usuarios implements UserDetails, AuthUser {
     public boolean isCredentialsNonExpired() { return true; }
 
     @Override
-    public boolean isEnabled() { return true; }
+    public boolean isEnabled() {
+        return this.ativo;
+    }
 
     public UsuarioResponseDTO toDtoResponse() {
         return new UsuarioResponseDTO(this);

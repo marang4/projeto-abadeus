@@ -7,10 +7,8 @@ public record CepResponseDTO(
         String logradouro,
         String complemento,
         String bairro,
-
-        @JsonProperty("localidade") // O ViaCEP manda "localidade", e o Jackson joga para "cidade"
+        @JsonProperty("localidade")
         String cidade,
-
         String uf,
         Boolean erro
 ) {}
