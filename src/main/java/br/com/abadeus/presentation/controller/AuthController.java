@@ -100,6 +100,19 @@ public class AuthController {
         }
     }
 
+    @GetMapping("/confirmar-email")
+    @Operation(summary = "Confirmar E-mail", description = "Valida o token e ativa a conta do usuário.")
+    public ResponseEntity<?> confirmarEmail(@RequestParam("token") String token) {
+        try {
+            authService.confirmarEmail(token);
+            return ResponseEntity.ok(ResponseUtil.response("E-mail confirmado com sucesso! Você já pode fazer login."));
+
+        } catch (RegraDeNegocioException e) {
+            return ResponseEntity.status(determinarStatusErro(e.getMessage()))
+                    .body(ResponseUtil.response(e.getMessage()));
+        }
+    }
+
     private HttpStatus determinarStatusErro(String mensagem) {
         if (mensagem == null) return HttpStatus.BAD_REQUEST; // 400
 

@@ -1,13 +1,18 @@
 package br.com.abadeus.domain.entity;
 
+import br.com.abadeus.domain.enums.TipoCliente;
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @Table(name = "clientes")
 public class Clientes {
@@ -25,6 +30,10 @@ public class Clientes {
     @Column(nullable = false)
     private LocalDate dataNascimento;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TipoCliente tipoCliente;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_endereco")
     private Enderecos endereco;
@@ -32,4 +41,19 @@ public class Clientes {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "id_usuario", referencedColumnName = "id")
     private Usuarios usuario;
+
+    @Column
+    private String urlDocumento;
+
+    @Column(nullable = false)
+    private boolean ativo = true;
+
+    @Column
+    private LocalDateTime deletadoEm;
+
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Responsavel> responsaveis;
+
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ResponsavelBuscar> responsaveisBuscar;
 }

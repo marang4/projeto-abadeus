@@ -40,4 +40,5 @@ public class Eventos {
     private LocalDateTime dataHora;
 
     private LocalDateTime dataCriacao;
+
 }

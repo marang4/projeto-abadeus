@@ -41,11 +41,16 @@ public class AuthService {
         boolean valido = validarCredenciais(request.email(), request.senha());
 
         if (!valido) {
-            // Lança a exceção customizada; o Controller vai mapear para 401 (UNAUTHORIZED)
             throw new RegraDeNegocioException("Credenciais inválidas.");
         }
 
         Usuarios user = buscarPorEmail(request.email());
+
+        // NOVA REGRA: Bloquear se não ativou o e-mail
+        if (!user.isAtivo()) {
+            throw new RegraDeNegocioException("Conta inativa. Verifique seu e-mail para confirmar o cadastro.");
+        }
+
         String token = tokenService.gerarToken(user);
 
         Cookie authCookie = new Cookie("token", token);
@@ -57,6 +62,24 @@ public class AuthService {
         response.addCookie(authCookie);
 
         return new UsuarioResponseDTO(user);
+    }
+
+    @Transactional
+    public void confirmarEmail(String token) {
+        Usuarios user = buscarTokenAtivacao(token);
+
+        if (user == null) {
+            throw new RegraDeNegocioException("Token de confirmação inválido ou já utilizado.");
+        }
+
+        user.setAtivo(true);
+        user.setTokenAtivacao(null); // Limpa o token para não ser usado de novo
+
+        salvar(user);
+    }
+
+    private Usuarios buscarTokenAtivacao(String token) {
+        return usuarioRepository.findByTokenAtivacao(token).orElse(null);
     }
 
     public void realizarLogout(HttpServletResponse response) {
